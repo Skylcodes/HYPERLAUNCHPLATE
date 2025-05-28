@@ -25,12 +25,9 @@
         "name": "next"
       }
     ],
-    "typeRoots": [
-      "./node_modules/@types",
-      "./types"
-    ],
     "paths": {
       "@/*": ["./*"],
+      "@/types/*": ["./types/*"],
       "content-collections": ["./.content-collections/generated"]
     }
   },

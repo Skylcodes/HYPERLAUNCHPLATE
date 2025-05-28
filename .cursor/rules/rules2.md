@@ -416,6 +416,3 @@ globs: **/*.{ts,tsx}
 - Implement proper type inference for better code readability
 - Use type guards and assertions for runtime type checking
 
-
-
-

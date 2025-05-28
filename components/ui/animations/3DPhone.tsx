@@ -19,12 +19,24 @@ const iconMap: Record<IconType, React.ElementType> = {
 };
 
 // Define interface for notification items
+// Define specific color values that can be used
+const NotificationColors = {
+    BLUE: 'bg-blue-500/10',
+    PURPLE: 'bg-purple-500/10',
+    PINK: 'bg-pink-500/10',
+    EMERALD: 'bg-emerald-500/10',
+    AMBER: 'bg-amber-500/10',
+    ROSE: 'bg-rose-500/10'
+} as const;
+
+type NotificationColor = keyof typeof NotificationColors;
+
 interface Notification {
     iconType: IconType;
     title: string;
     description: string;
     time: string;
-    color: string;
+    color: NotificationColor;
     highlight?: boolean;
 }
 
@@ -32,34 +44,31 @@ const notifications: Notification[] = [
     {
         iconType: 'DollarSign',
         title: "Major Revenue Milestone",
-        description: "$150K MRR achieved in 3 months",
-        time: "2m ago",
-        color: "text-green-400",
-        highlight: true
-    },
-    {
-        iconType: 'TrendingUp',
-        title: "Enterprise Deal Closed",
-        description: "$500K annual contract signed",
-        time: "15m ago",
-        color: "text-blue-400",
+        description: "Your revenue has increased by 25% this month!",
+        time: "2h ago",
+        color: "BLUE",
         highlight: true
     },
     {
         iconType: 'Users',
-        title: "Rapid User Growth",
-        description: "10,000 new users this month",
-        time: "1h ago",
-        color: "text-purple-400",
-        highlight: true
+        title: "New Team Member",
+        description: "Alex joined your team. Welcome them!",
+        time: "1d ago",
+        color: "PURPLE"
     },
     {
         iconType: 'Star',
-        title: "Success Story",
-        description: "Client reached $1M ARR milestone",
-        time: "2h ago",
-        color: "text-yellow-400",
-        highlight: true
+        title: "Project Update",
+        description: "The new feature has been deployed to production.",
+        time: "3d ago",
+        color: "PINK"
+    },
+    {
+        iconType: 'TrendingUp',
+        title: "Performance Boost",
+        description: "Your app's performance has improved by 40%.",
+        time: "1w ago",
+        color: "EMERALD"
     }
 ];
 
@@ -133,7 +142,7 @@ function SuccessTrackerContent() {
                             >
                                 <div className="flex items-center gap-2">
                                     {/* Icon container */}
-                                    <div className={`relative p-1.5 rounded-lg bg-gradient-to-br from-gray-100/80 to-gray-50/80 dark:from-[#1C1C2E]/80 dark:to-[#1C1C2E]/60 ${notification.color} shadow-sm`}>
+                                    <div className={`relative p-1.5 rounded-lg bg-gradient-to-br from-gray-100/80 to-gray-50/80 dark:from-[#1C1C2E]/80 dark:to-[#1C1C2E]/60 ${NotificationColors[notification.color]} shadow-sm`}>
                                         <IconComponent className="w-3.5 h-3.5 relative z-10" />
                                     </div>
 
@@ -334,8 +343,9 @@ export default function PhoneDisplay() {
                     rotation={[0, 0, 0]}
                     polar={[-0.2, 0.2]}
                     azimuth={[-0.5, 0.5]}
-                    config={{ mass: 1, stiffness: 400, damping: 15 }}
-                    snap={{ mass: 1, stiffness: 300, damping: 10 }}
+                    snap={true}
+                    speed={2}
+                    zoom={1}
                 >
                     <Phone rotation={[0.4, -0.3, 0]} position={[0, 0, 0]} />
                 </PresentationControls>
