@@ -8,7 +8,6 @@ import { DollarSign, TrendingUp, Users, Star, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ScrollReveal from '@/components/ui/animations/ScrollReveal';
 import GradientText from '@/components/ui/animations/GradientText';
-import HeroScene from '@/components/ui/animations/HeroScene';
 import { cn } from '@/lib/utils';
 
 // Define a type for the icon map keys
@@ -273,9 +272,6 @@ export function Hero(): React.JSX.Element {
 
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden w-full pb-20 pt-20 px-4 transform translate-x-[-7%]">
-      {/* 3D scene */}
-      <HeroScene />
-
       {/* Success tracker notification feed */}
       <NotificationFeed />
 
