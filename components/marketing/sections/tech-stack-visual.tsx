@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { motion, useAnimation, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion'; // Removed useAnimation
 
 // Tech logos
 const technologies = [
@@ -68,124 +68,42 @@ interface LineProps {
   active: boolean;
 }
 
-// Animated flowing line component
-const AnimatedLine: React.FC<LineProps> = ({ start, end }) => {
+// Simplified line component
+const ConnectionLine: React.FC<LineProps> = ({ start, end }) => {
   const path = `M${start.x},${start.y} L${end.x},${end.y}`;
-
+  
   return (
-    <>
-      {/* Base line with original gradient */}
-      <motion.path
-        d={path}
-        stroke="url(#activeGradient)"
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        fill="none"
-        initial={{ opacity: 0.3 }}
-        animate={{ opacity: 0.3 }}
-        style={{
-          filter: "drop-shadow(0 0 1px rgba(99, 102, 241, 0.15))",
-        }}
-      />
-
-      {/* Refined pulse overlay with reversing animation */}
-      <motion.path
-        d={path}
-        stroke="rgba(0, 0, 0, 0.95)"
-        strokeWidth={2}
-        strokeLinecap="round"
-        fill="none"
-        initial={{ opacity: 0 }}
-        animate={{
-          opacity: [0, 0.7, 0],
-          strokeWidth: [1.5, 2.5, 1.5],
-        }}
-        transition={{
-          duration: 3,
-          ease: "easeInOut",
-          repeat: Infinity,
-          repeatType: "reverse",
-          times: [0, 0.5, 1],
-        }}
-        style={{
-          filter: "drop-shadow(0 0 1px rgba(255, 255, 255, 0.2))",
-          mixBlendMode: "plus-lighter",
-        }}
-      />
-
-      {/* Flowing light effect with seamless reverse */}
-      <motion.path
-        d={path}
-        stroke="rgba(0, 0, 0, 1)"
-        strokeWidth={1}
-        strokeLinecap="round"
-        fill="none"
-        initial={{ pathLength: 0, opacity: 0 }}
-        animate={{
-          pathLength: [0, 1, 0],
-          opacity: [0.4, 0.8, 0.4],
-        }}
-        transition={{
-          duration: 4,
-          ease: "easeInOut",
-          repeat: Infinity,
-          repeatType: "reverse",
-          times: [0, 0.5, 1],
-        }}
-        style={{
-          filter: "drop-shadow(0 0 1px rgba(255, 255, 255, 0.25))",
-          mixBlendMode: "plus-lighter",
-        }}
-      />
-
-      {/* Additional contrast enhancement layer */}
-      <motion.path
-        d={path}
-        stroke="rgba(0, 0, 0, 1)"
-        strokeWidth={0.5}
-        strokeLinecap="round"
-        fill="none"
-        initial={{ pathLength: 0, opacity: 0 }}
-        animate={{
-          pathLength: [1, 0, 1],
-          opacity: [0.3, 0.6, 0.3],
-        }}
-        transition={{
-          duration: 5,
-          ease: "easeInOut",
-          repeat: Infinity,
-          repeatType: "reverse",
-          times: [0, 0.5, 1],
-        }}
-        style={{
-          filter: "drop-shadow(0 0 1px rgba(255, 255, 255, 0.15))",
-          mixBlendMode: "plus-lighter",
-        }}
-      />
-    </>
+    <path
+      d={path}
+      stroke="url(#activeGradient)"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      fill="none"
+      opacity="0.3"
+      className="transition-opacity duration-300 hover:opacity-70"
+    />
   );
 };
 
 export function TechStackVisual() {
-  // Reference for container measurements
   const containerRef = useRef<HTMLDivElement>(null);
-  const [dimensions, setDimensions] = React.useState({ width: 0, height: 0 });
-  const [hoveredTech, setHoveredTech] = React.useState<string | null>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [hoveredTech, setHoveredTech] = useState<string | null>(null);
 
+  // Set initial dimensions and handle resize
   useEffect(() => {
-    if (containerRef.current) {
-      setDimensions({
-        width: containerRef.current.offsetWidth,
-        height: containerRef.current.offsetHeight,
-      });
-    }
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        setDimensions({
+          width: containerRef.current.offsetWidth,
+          height: containerRef.current.offsetHeight,
+        });
+      }
+    };
 
-    // Add subtle animation for logos
-    const interval = setInterval(() => {
-      // No need to change active states as all nodes are always active
-    }, 4000);
-
-    return () => clearInterval(interval);
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
   // Calculate node positions based on container dimensions
@@ -232,12 +150,7 @@ export function TechStackVisual() {
       <div className="container px-4 md:px-6">
         {/* Explanation block - now centered above */}
         <div className="max-w-3xl mx-auto mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-6 text-center"
-          >
+          <div className="space-y-6 text-center">
             {/* Small box header */}
             <div className="inline-block">
               <div className="bg-[#1e293b]/70 backdrop-blur-sm border border-[#334155]/50 rounded-full px-4 py-1.5 text-sm text-blue-400">
@@ -256,31 +169,28 @@ export function TechStackVisual() {
             <p className="text-gray-400 text-lg">
               Launch faster with our production-ready tech stack, trusted by developers to scale from MVP to millions of users without breaking a sweat.
             </p>
-          </motion.div>
+          </div>
         </div>
 
         {/* Tech stack visualization - slightly larger size */}
         <div ref={containerRef} className="relative w-full max-w-[56rem] mx-auto aspect-[16/9] bg-slate-950/60 rounded-2xl overflow-hidden backdrop-blur-sm border border-slate-900">
           {/* Background grid with subtle pulse animation */}
-          <motion.div
-            className="absolute inset-0 grid grid-cols-12 grid-rows-12"
-            animate={{
-              opacity: [0.5, 0.7, 0.5],
-            }}
-            transition={{
-              duration: 8,
-              ease: "easeInOut",
-              repeat: Infinity,
-              repeatType: "reverse"
-            }}
-          >
+          <div className="absolute inset-0 grid grid-cols-12 grid-rows-12 opacity-50">
             {Array.from({ length: 13 }).map((_, i) => (
-              <div key={`v-${i}`} className="absolute left-0 right-0 h-px bg-slate-900" style={{ top: `${(i * 100) / 12}%` }} />
+              <div 
+                key={`v-${i}`} 
+                className="absolute left-0 right-0 h-px bg-slate-900" 
+                style={{ top: `${(i * 100) / 12}%` }} 
+              />
             ))}
             {Array.from({ length: 13 }).map((_, i) => (
-              <div key={`h-${i}`} className="absolute top-0 bottom-0 w-px bg-slate-900" style={{ left: `${(i * 100) / 12}%` }} />
+              <div 
+                key={`h-${i}`} 
+                className="absolute top-0 bottom-0 w-px bg-slate-900" 
+                style={{ left: `${(i * 100) / 12}%` }} 
+              />
             ))}
-          </motion.div>
+          </div>
 
           {/* Glowing background effect */}
           <div className="absolute inset-0 bg-gradient-radial from-blue-500/5 to-transparent opacity-70"></div>
@@ -302,7 +212,7 @@ export function TechStackVisual() {
               </filter>
             </defs>
 
-            {/* Connection lines with animation */}
+            {/* Connection lines */}
             {connections.map((connection, index) => {
               const fromNode = technologies.find(t => t.name === connection.from);
               const toNode = technologies.find(t => t.name === connection.to);
@@ -313,7 +223,7 @@ export function TechStackVisual() {
               const end = getNodePosition(toNode.position);
 
               return (
-                <AnimatedLine
+                <ConnectionLine
                   key={`line-${index}`}
                   start={start}
                   end={end}
@@ -329,19 +239,8 @@ export function TechStackVisual() {
             const isHovered = hoveredTech === tech.name;
 
             return (
-              <motion.div
+              <div
                 key={tech.name}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{
-                  opacity: 1,
-                  scale: isHovered ? 1.1 : 1,
-                  boxShadow: isHovered ? '0 0 25px rgba(59, 130, 246, 0.5)' : '0 0 15px rgba(59, 130, 246, 0.3)',
-                }}
-                whileHover={{
-                  scale: 1.1,
-                  boxShadow: '0 0 25px rgba(59, 130, 246, 0.5)',
-                }}
-                transition={{ duration: 0.3 }}
                 className="absolute rounded-full overflow-visible backdrop-blur-[2px] border bg-white/[0.02] border-blue-500/20"
                 style={{
                   left: `${position.x - 28}px`,
@@ -353,15 +252,10 @@ export function TechStackVisual() {
                 onMouseEnter={() => setHoveredTech(tech.name)}
                 onMouseLeave={() => setHoveredTech(null)}
               >
-                <motion.div
-                  className="flex items-center justify-center w-full h-full p-3 relative rounded-full"
-                  animate={{
-                    boxShadow: isHovered ? ['inset 0 0 10px rgba(59, 130, 246, 0.15)', 'inset 0 0 15px rgba(59, 130, 246, 0.3)', 'inset 0 0 10px rgba(59, 130, 246, 0.15)'] : 'none'
-                  }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    repeatType: "reverse"
+                <div 
+                  className="flex items-center justify-center w-full h-full p-3 relative rounded-full transition-all duration-300"
+                  style={{
+                    boxShadow: isHovered ? 'inset 0 0 15px rgba(59, 130, 246, 0.3)' : 'none'
                   }}
                 >
                   <Image
@@ -390,8 +284,8 @@ export function TechStackVisual() {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
             );
           })}
         </div>
