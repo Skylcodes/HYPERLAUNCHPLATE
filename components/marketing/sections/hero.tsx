@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { DollarSign, TrendingUp, Users, Star, ChevronUp } from 'lucide-react';
+import { useAdaptiveUI } from '@/hooks/use-adaptive-ui';
 
 import { Button } from '@/components/ui/button';
 import ScrollReveal from '@/components/ui/animations/ScrollReveal';
@@ -111,8 +112,40 @@ function NotificationFeed() {
     </div>
   );
 
+  // Use our adaptive UI hook to respond to screen size changes
+  const { isMobile, isTablet, isDesktop, width } = useAdaptiveUI();
+  
+  // Calculate position and size based on screen width
+  const getPositionStyles = () => {
+    // Only show on desktop and larger screens
+    if (width < 1024) return { display: 'none' };
+    
+    // For medium-sized screens, adjust position to prevent overlap
+    if (width >= 1024 && width < 1280) {
+      return {
+        top: '20px',
+        right: '20px',
+        width: '320px',
+        height: '580px'
+      };
+    }
+    
+    // For large screens, use original positioning
+    return {
+      top: '20px',
+      right: '5%',
+      width: '360px',
+      height: '640px'
+    };
+  };
+  
+  const positionStyles = getPositionStyles();
+  
   return (
-    <div className="absolute top-20 right-[5%] w-[360px] h-[640px] rounded-[32px] z-20 hidden lg:block">
+    <div 
+      className="absolute rounded-[32px] z-20 hidden lg:block transition-all duration-300"
+      style={positionStyles}
+    >
       {/* Premium border effect container */}
       <div className="absolute inset-0 rounded-[32px] p-[2px] overflow-visible">
         {/* Animated gradient border */}
@@ -270,21 +303,70 @@ export function Hero(): React.JSX.Element {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Use our adaptive UI hook for the main section as well
+  const { width } = useAdaptiveUI();
+  
+  // Calculate the appropriate transform and padding based on screen width
+  const getMainContentStyles = () => {
+    // For mobile screens, center the content without any transform
+    if (width < 640) {
+      return {
+        transform: 'none',
+        paddingLeft: '1rem',
+        paddingRight: '1rem',
+        maxWidth: '100%'
+      };
+    }
+    
+    // For small to medium screens, use a small transform
+    if (width >= 640 && width < 1024) {
+      return {
+        transform: 'translateX(-3%)',
+        paddingLeft: '2rem',
+        paddingRight: '2rem',
+        maxWidth: '100%'
+      };
+    }
+    
+    // For large screens with notification visible, adjust transform to prevent overlap
+    if (width >= 1024 && width < 1280) {
+      return {
+        transform: 'translateX(-10%)',
+        paddingLeft: '2rem',
+        paddingRight: '2rem',
+        maxWidth: '85%'
+      };
+    }
+    
+    // For extra large screens, use original transform
+    return {
+      transform: 'translateX(-7%)',
+      paddingLeft: '2rem',
+      paddingRight: '2rem',
+      maxWidth: '100%'
+    };
+  };
+  
+  const mainContentStyles = getMainContentStyles();
+  
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden w-full pb-20 pt-20 px-4 transform translate-x-[-7%]">
+    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden w-full pb-20 pt-20 px-4">
       {/* Success tracker notification feed */}
       <NotificationFeed />
 
-      {/* Main content - positioned based on reference UI */}
-      <div className="relative z-10 container px-8 mx-auto transform -translate-x-[7%]">
+      {/* Main content - positioned based on reference UI with adaptive positioning */}
+      <div 
+        className="relative z-10 container mx-auto transition-all duration-300"
+        style={mainContentStyles}
+      >
         <ScrollReveal>
           <h1 className="text-center font-bold tracking-tight max-w-[95%] mx-auto">
-            <GradientText className="text-5xl sm:text-6xl md:text-6xl lg:text-[6.2rem] [text-shadow:_0_1px_3px_rgb(0_0_0_/_10%)] dark:[text-shadow:_0_1px_3px_rgb(255_255_255_/_10%)]">
+            <GradientText className="text-4xl sm:text-5xl md:text-6xl lg:text-[6.2rem] [text-shadow:_0_1px_3px_rgb(0_0_0_/_10%)] dark:[text-shadow:_0_1px_3px_rgb(255_255_255_/_10%)]">
               Launch Your SaaS
             </GradientText>
             <div className="mt-4">
               <GradientText
-                className="text-5xl sm:text-6xl md:text-6xl lg:text-[6.2rem] [text-shadow:_0_1px_3px_rgb(0_0_0_/_10%)] dark:[text-shadow:_0_1px_3px_rgb(255_255_255_/_10%)]"
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-[6.2rem] [text-shadow:_0_1px_3px_rgb(0_0_0_/_10%)] dark:[text-shadow:_0_1px_3px_rgb(255_255_255_/_10%)]"
                 from="#4B7BF5"
                 to="#9181F2"
                 animate={true}

@@ -6,6 +6,7 @@ import { ThemeProvider } from 'next-themes';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { AdaptiveUIProvider } from '@/contexts/adaptive-ui-context';
 
 export function Providers({
   children
@@ -18,9 +19,11 @@ export function Providers({
         enableSystem
         disableTransitionOnChange
       >
-        <TooltipProvider>
-          <NiceModal.Provider>{children}</NiceModal.Provider>
-        </TooltipProvider>
+        <AdaptiveUIProvider>
+          <TooltipProvider>
+            <NiceModal.Provider>{children}</NiceModal.Provider>
+          </TooltipProvider>
+        </AdaptiveUIProvider>
       </ThemeProvider>
     </NuqsAdapter>
   );
