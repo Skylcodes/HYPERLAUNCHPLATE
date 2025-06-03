@@ -41,7 +41,7 @@ import {
 // Device frame component for feature previews
 const DeviceFrame = ({ children, type = 'phone' }: { children: React.ReactNode; type?: 'phone' | 'browser' }) => {
     return (
-        <div className={`relative ${type === 'phone' ? 'w-[280px] scale-[1.15]' : 'w-full max-w-[640px] scale-105'} origin-center`}>
+        <div className={`relative ${type === 'phone' ? 'w-[180px] sm:w-[200px] md:w-[240px] lg:w-[280px] scale-[0.85] sm:scale-[0.9] md:scale-100 lg:scale-[1.15]' : 'w-full max-w-[90%] sm:max-w-[95%] md:max-w-[640px] scale-90 sm:scale-95 md:scale-100 lg:scale-105'} origin-center`}>
             {type === 'phone' ? (
                 <div className="relative rounded-[40px] border-[8px] border-slate-800 bg-slate-900 shadow-2xl overflow-hidden">
                     <div className="absolute top-0 inset-x-0 h-6 bg-slate-800 rounded-t-[24px]">
@@ -75,7 +75,7 @@ const DeviceFrame = ({ children, type = 'phone' }: { children: React.ReactNode; 
 // Feature-specific preview components with realistic data
 const SEOPreview = () => (
     <DeviceFrame type="browser">
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4 scale-90 sm:scale-95 md:scale-100 origin-top">
             <div className="flex items-center gap-3">
                 <SearchIcon className="w-5 h-5 text-blue-400" />
                 <div className="flex-1 h-8 bg-slate-800 rounded flex items-center px-3">
@@ -208,7 +208,7 @@ const DatabasePreview = () => (
 
 const AnalyticsPreview = () => (
     <DeviceFrame type="browser">
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4 scale-90 sm:scale-95 md:scale-100 origin-top">
             <div className="grid grid-cols-3 gap-3">
                 {[{ title: 'Users', value: '1,284', change: '+12%', icon: Users2 },
                 { title: 'Revenue', value: '$3,450', change: '+8%', icon: DollarSignIcon },
@@ -321,7 +321,7 @@ const EmailPreview = () => (
 
 const BlogPreview = () => (
     <DeviceFrame type="browser">
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4 scale-90 sm:scale-95 md:scale-100 origin-top">
             <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                     <BookOpenIcon className="w-5 h-5 text-blue-400" />
@@ -424,10 +424,10 @@ const MobileOptimizationPreview = () => (
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 150, damping: 20, delay: 0.1 }}
-        className="transform scale-[1.1] origin-center"
+        className="transform scale-[0.7] sm:scale-[0.8] md:scale-90 lg:scale-100 origin-center flex items-center justify-center w-full h-full"
     >
         <DeviceFrame type="phone">
-            <div className="h-[450px] p-2.5 bg-gradient-to-b from-slate-900/80 to-slate-950/90 overflow-hidden flex flex-col text-xs">
+            <div className="h-[280px] sm:h-[320px] md:h-[380px] lg:h-[450px] p-1 sm:p-1.5 md:p-2 lg:p-2.5 bg-gradient-to-b from-slate-900/80 to-slate-950/90 overflow-hidden flex flex-col text-[0.65rem] sm:text-xs">
                 <div className="flex items-center justify-between p-2 mb-2 flex-shrink-0">
                     <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-600" />
                     <div className="flex gap-2">
@@ -605,17 +605,17 @@ const FeatureHighlight = ({
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.98 }}
                     transition={{ duration: 0.3 }}
-                    className="absolute inset-0 flex flex-col items-start justify-center p-8 md:p-10 lg:p-12"
+                    className="absolute inset-0 flex flex-col items-start justify-start pt-12 sm:pt-4 sm:justify-center p-3 sm:p-4 md:p-6 lg:p-10 xl:p-12"
                 >
-                    <div className="grid grid-cols-1 lg:grid-cols-5 w-full gap-8 lg:gap-12 items-center">
-                        <div className="lg:col-span-2 flex flex-col justify-center space-y-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-5 w-full gap-2 sm:gap-3 md:gap-6 lg:gap-12 items-center">
+                        <div className="lg:col-span-2 flex flex-col justify-center space-y-2 sm:space-y-3 md:space-y-4 lg:space-y-6">
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.1, duration: 0.4 }}
-                                className="inline-flex items-center justify-center p-3 rounded-xl bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-blue-500/20 w-fit shadow-lg"
+                                className="inline-flex items-center justify-center p-2 sm:p-2.5 md:p-3 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-blue-500/20 w-fit shadow-lg"
                             >
-                                <Icon className="w-6 h-6 text-blue-300" />
+                                <Icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-300" />
                             </motion.div>
 
                             <div className="space-y-4">
@@ -623,7 +623,7 @@ const FeatureHighlight = ({
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.2, duration: 0.4 }}
-                                    className="text-2xl md:text-3xl font-bold text-white"
+                                    className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white"
                                 >
                                     {title}
                                 </motion.h3>
@@ -632,7 +632,7 @@ const FeatureHighlight = ({
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.3, duration: 0.4 }}
-                                    className="text-slate-400 text-base"
+                                    className="text-slate-400 text-xs sm:text-sm md:text-base"
                                 >
                                     {description}
                                 </motion.p>
@@ -646,7 +646,7 @@ const FeatureHighlight = ({
                                     {tech.map((item, i) => (
                                         <span
                                             key={i}
-                                            className="px-2.5 py-1 text-xs font-medium rounded-md bg-blue-900/40 text-blue-300 border border-blue-500/30 shadow-sm"
+                                            className="px-1.5 sm:px-2 md:px-2.5 py-0.5 sm:py-0.5 md:py-1 text-[0.65rem] sm:text-xs font-medium rounded-md bg-blue-900/40 text-blue-300 border border-blue-500/30 shadow-sm"
                                         >
                                             {item}
                                         </span>
@@ -675,9 +675,9 @@ const FeatureHighlight = ({
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             transition={{ delay: 0.3, duration: 0.5, type: 'spring', stiffness: 100 }}
-                            className="lg:col-span-3 flex items-center justify-center relative mt-8 lg:mt-0"
+                            className="lg:col-span-3 flex items-start sm:items-center justify-center pt-0 pb-4 sm:py-2 md:py-3 lg:py-0 relative -mt-16 sm:-mt-12 md:mt-6 lg:mt-0"
                         >
-                            <div className="relative w-full flex justify-center">
+                            <div className="relative w-full flex justify-center max-h-[250px] sm:max-h-[300px] md:max-h-[400px] lg:max-h-none overflow-visible scale-75 sm:scale-80 md:scale-90 lg:scale-100">
                                 {getFeaturePreview()}
                             </div>
                         </motion.div>
@@ -941,7 +941,7 @@ export function Features() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={inView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
                         transition={{ duration: 0.7, delay: 0.5 }}
-                        className="relative h-[400px] lg:h-auto lg:col-span-2 rounded-2xl border border-blue-500/20 bg-black/30 backdrop-blur-sm overflow-hidden"
+                        className="relative h-[450px] sm:h-[450px] md:h-[500px] lg:h-auto lg:col-span-2 rounded-2xl border border-blue-500/20 bg-black/30 backdrop-blur-sm overflow-hidden"
                     >
                         {features.map((feature, index) => (
                             <FeatureHighlight

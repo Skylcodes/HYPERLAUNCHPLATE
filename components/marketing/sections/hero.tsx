@@ -96,15 +96,19 @@ function NotificationFeed() {
     }
   }, [activeNotifications]);
 
+  // Skeleton loader for notifications
   const renderSkeleton = () => (
-    <div className="flex-1 divide-y divide-gray-200 dark:divide-white/[0.08]">
-      {[1, 2, 3, 4].map((index) => (
-        <div key={index} className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 animate-pulse" />
+    <div className="divide-y divide-gray-200 dark:divide-white/[0.08]">
+      {[...Array(5)].map((_, index) => (
+        <div key={index} className="p-3 sm:p-4 animate-pulse">
+          <div className="flex items-center gap-2.5 sm:gap-4">
+            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl bg-gray-200 dark:bg-white/[0.08]"></div>
             <div className="flex-1">
-              <div className="h-5 w-32 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded animate-pulse mb-2" />
-              <div className="h-4 w-48 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded animate-pulse" />
+              <div className="flex items-center justify-between">
+                <div className="h-3 sm:h-3.5 w-3/4 bg-gray-200 dark:bg-white/[0.08] rounded"></div>
+                <div className="h-2.5 sm:h-3 w-14 sm:w-16 bg-gray-200 dark:bg-white/[0.08] rounded ml-1.5 sm:ml-2"></div>
+              </div>
+              <div className="h-2.5 sm:h-3 w-full bg-gray-200 dark:bg-white/[0.08] rounded mt-1.5 sm:mt-2"></div>
             </div>
           </div>
         </div>
@@ -113,38 +117,43 @@ function NotificationFeed() {
   );
 
   // Use our adaptive UI hook to respond to screen size changes
-  const { isMobile, isTablet, isDesktop, width } = useAdaptiveUI();
+  const { width } = useAdaptiveUI();
   
-  // Calculate position and size based on screen width
-  const getPositionStyles = () => {
-    // Only show on desktop and larger screens
-    if (width < 1024) return { display: 'none' };
-    
-    // For medium-sized screens, adjust position to prevent overlap
-    if (width >= 1024 && width < 1280) {
-      return {
-        top: '20px',
-        right: '20px',
-        width: '320px',
-        height: '580px'
-      };
-    }
-    
-    // For large screens, use original positioning
-    return {
-      top: '20px',
-      right: '5%',
-      width: '360px',
-      height: '640px'
-    };
+  // Use static classes based on screen size to avoid hydration mismatch
+  // This uses fixed CSS classes instead of dynamic calculations
+  let notificationClasses = 'absolute rounded-[32px] flex flex-col transition-all duration-500 shadow-2xl overflow-hidden';
+  
+  // Add size-specific classes - these will be consistent between server and client
+  if (width < 640) {
+    // Mobile mode - notification feed appears below main content
+    notificationClasses += ' relative static mx-auto mt-8 w-full max-w-[380px] h-[400px]';
+  } else if (width >= 640 && width < 1024) {
+    // Tablet mode - still below content but with adjusted sizing
+    notificationClasses += ' relative static mx-auto mt-10 w-[380px] h-[450px]';
+  } else if (width >= 1024 && width < 1280) {
+    // Laptop mode - positioned to the right as before
+    notificationClasses += ' top-[140px] right-[40px] w-[300px] min-h-[480px] lg:block origin-top-right scale-[0.9]';
+  } else if (width >= 1280 && width < 1536) {
+    // Large desktop - fixed gaps and improved alignment
+    notificationClasses += ' top-[130px] right-[5.5%] w-[340px] min-h-[540px] xl:block origin-top-right scale-[0.95]';
+  } else {
+    // Extra large screens - optimized for large monitors with no gaps
+    notificationClasses += ' top-[120px] right-[6.5%] w-[380px] h-[560px] 2xl:block origin-top-right scale-100';
+  }
+  
+  // Additional styles that don't affect hydration
+  const additionalStyles: React.CSSProperties = {
+    boxShadow: '0 14px 35px -10px rgba(0, 0, 0, 0.15), 0 10px 20px -8px rgba(0, 0, 0, 0.12)',
+    maxHeight: '90vh',
+    zIndex: 20,
+    // Ensure consistent rendering between server and client
+    visibility: 'visible'
   };
-  
-  const positionStyles = getPositionStyles();
   
   return (
     <div 
-      className="absolute rounded-[32px] z-20 hidden lg:block transition-all duration-300"
-      style={positionStyles}
+      className={notificationClasses}
+      style={additionalStyles}
     >
       {/* Premium border effect container */}
       <div className="absolute inset-0 rounded-[32px] p-[2px] overflow-visible">
@@ -171,106 +180,108 @@ function NotificationFeed() {
           >
             {/* Header */}
             <motion.div
-              className="p-6 border-b border-gray-200 dark:border-white/[0.08]"
+              className="p-4 sm:p-5 border-b border-gray-200 dark:border-white/[0.08]"
               initial={{ opacity: 1, y: 0 }}
               animate={{ opacity: 1, y: 0 }}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white tracking-tight">
+                  <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white tracking-tight">
                     Success Tracker
                   </h3>
-                  <p className="text-sm text-gray-900 dark:text-gray-500 mt-1">Real-time founder profits</p>
+                  <p className="text-xs sm:text-sm text-gray-900 dark:text-gray-500 mt-1">Real-time founder profits</p>
                 </div>
-                <div className="flex items-center gap-2 bg-gray-50 dark:bg-[#1C1C2E] px-3 py-1 rounded-full border border-green-500/20">
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-[pulse_2s_ease-in-out_infinite]" />
-                  <span className="text-xs font-medium text-green-700 dark:text-green-500">Live Feed</span>
+                <div className="flex items-center gap-1.5 sm:gap-2 bg-gray-50 dark:bg-[#1C1C2E] px-2.5 sm:px-3 py-1 rounded-full border border-green-500/20">
+                  <div className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-green-500 animate-[pulse_2s_ease-in-out_infinite]" />
+                  <span className="text-[10px] sm:text-xs font-medium text-green-700 dark:text-green-500">Live Feed</span>
                 </div>
               </div>
             </motion.div>
 
             {/* Notifications */}
-            {isLoading ? renderSkeleton() : (
-              <div className="flex-1 divide-y divide-gray-200 dark:divide-white/[0.08]">
-                {activeNotifications.map((notification, index) => {
-                  const IconComponent = iconMap[notification.iconType] as React.ElementType;
-                  return (
-                    <motion.div
-                      key={index}
-                      className={`relative p-6 hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-all duration-300 cursor-pointer group ${notification.highlight ? 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 dark:from-blue-500/10 dark:to-purple-500/10' : ''
-                        }`}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: index * 0.1 }}
-                    >
-                      <div className="flex items-center gap-4">
-                        {/* Enhanced icon container with premium effect */}
-                        <motion.div
-                          whileHover={{ scale: 1.05, rotate: [0, -10, 10, -10, 0] }}
-                          className={`relative p-3 rounded-xl bg-gradient-to-br from-gray-100/80 to-gray-50/80 dark:from-[#1C1C2E]/80 dark:to-[#1C1C2E]/60 backdrop-blur-sm ${notification.color} shadow-lg group-hover:shadow-xl transition-all duration-300`}
-                        >
-                          {/* Animated gradient border */}
-                          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                            style={{
-                              backgroundSize: '200% 100%',
-                              animation: 'gradientFlow 4s linear infinite'
-                            }}
-                          />
-                          {/* Glow effect */}
-                          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                          <IconComponent className="w-5 h-5 relative z-10" />
-                        </motion.div>
+            <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent" style={{ minHeight: 0 }}>
+              {isLoading ? renderSkeleton() : (
+                <div className="divide-y divide-gray-200 dark:divide-white/[0.08]">
+                  {activeNotifications.map((notification, index) => {
+                    const IconComponent = iconMap[notification.iconType] as React.ElementType;
+                    return (
+                      <motion.div
+                        key={index}
+                        className={`relative p-4 sm:p-5 xl:p-[1.35rem] 2xl:p-[1.4rem] hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-all duration-300 cursor-pointer group ${notification.highlight ? 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 dark:from-blue-500/10 dark:to-purple-500/10' : ''}
+                          `}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: index * 0.1 }}
+                      >
+                        <div className="flex items-center gap-2.5 sm:gap-4">
+                          {/* Enhanced icon container with premium effect */}
+                          <motion.div
+                            whileHover={{ scale: 1.05, rotate: [0, -10, 10, -10, 0] }}
+                            className={`relative p-2 sm:p-2.5 rounded-xl bg-gradient-to-br from-gray-100/80 to-gray-50/80 dark:from-[#1C1C2E]/80 dark:to-[#1C1C2E]/60 backdrop-blur-sm ${notification.color} shadow-lg group-hover:shadow-xl transition-all duration-300`}
+                          >
+                            {/* Animated gradient border */}
+                            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                              style={{
+                                backgroundSize: '200% 100%',
+                                animation: 'gradientFlow 4s linear infinite'
+                              }}
+                            />
+                            {/* Glow effect */}
+                            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            <IconComponent className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 relative z-10" />
+                          </motion.div>
 
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <p className={`text-base font-medium truncate transition-colors duration-300 ${notification.highlight
-                              ? 'bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent'
-                              : 'text-gray-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-400'}`}>
-                              {notification.title}
-                            </p>
-                            <p className="text-sm text-gray-900 dark:text-gray-500 ml-2">
-                              {notification.time}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <p className={`text-xs sm:text-sm font-medium truncate transition-colors duration-300 ${notification.highlight
+                                ? 'bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent'
+                                : 'text-gray-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-400'}`}>
+                                {notification.title}
+                              </p>
+                              <p className="text-[10px] sm:text-xs text-gray-900 dark:text-gray-500 ml-1.5 sm:ml-2">
+                                {notification.time}
+                              </p>
+                            </div>
+                            <p className="text-[10px] sm:text-xs text-gray-900 dark:text-gray-500 mt-0.5 sm:mt-1 group-hover:text-gray-700 dark:group-hover:text-gray-400 transition-colors duration-300">
+                              {notification.description}
                             </p>
                           </div>
-                          <p className="text-sm text-gray-900 dark:text-gray-500 mt-1 group-hover:text-gray-700 dark:group-hover:text-gray-400 transition-colors duration-300">
-                            {notification.description}
-                          </p>
                         </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            )}
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
 
             {/* Stats Footer */}
             <motion.div
-              className="p-6 border-t border-gray-200 dark:border-white/[0.08] bg-white dark:bg-[#0A0A1B]"
+              className="p-3 sm:p-4 xl:p-[1.35rem] 2xl:p-[1.4rem] border-t border-gray-200 dark:border-white/[0.08] bg-white dark:bg-[#0A0A1B]"
               initial={{ opacity: 1, y: 0 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-2 sm:gap-4">
                 <div className="text-center">
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">24k</p>
-                  <p className="text-xs text-gray-900 dark:text-gray-500 mt-1">Users</p>
-                  <div className="mt-2 text-xs text-green-700 dark:text-green-400 flex items-center justify-center font-medium">
-                    <TrendingUp className="w-3 h-3 mr-1" />
+                  <p className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">24k</p>
+                  <p className="text-[10px] sm:text-xs text-gray-900 dark:text-gray-500 mt-0.5 sm:mt-1">Users</p>
+                  <div className="mt-0.5 sm:mt-1.5 text-[10px] sm:text-xs text-green-700 dark:text-green-400 flex items-center justify-center font-medium">
+                    <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                     +28%
                   </div>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">$89k</p>
-                  <p className="text-xs text-gray-900 dark:text-gray-500 mt-1">MRR</p>
-                  <div className="mt-2 text-xs text-green-700 dark:text-green-400 flex items-center justify-center font-medium">
-                    <TrendingUp className="w-3 h-3 mr-1" />
+                  <p className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">$89k</p>
+                  <p className="text-[10px] sm:text-xs text-gray-900 dark:text-gray-500 mt-0.5 sm:mt-1">MRR</p>
+                  <div className="mt-0.5 sm:mt-1.5 text-[10px] sm:text-xs text-green-700 dark:text-green-400 flex items-center justify-center font-medium">
+                    <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                     +64%
                   </div>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">98%</p>
-                  <p className="text-xs text-gray-900 dark:text-gray-500 mt-1">Growth</p>
-                  <div className="mt-2 text-xs text-green-700 dark:text-green-400 flex items-center justify-center font-medium">
-                    <TrendingUp className="w-3 h-3 mr-1" />
+                  <p className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">98%</p>
+                  <p className="text-[10px] sm:text-xs text-gray-900 dark:text-gray-500 mt-0.5 sm:mt-1">Growth</p>
+                  <div className="mt-0.5 sm:mt-1.5 text-[10px] sm:text-xs text-green-700 dark:text-green-400 flex items-center justify-center font-medium">
+                    <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                     +124%
                   </div>
                 </div>
@@ -306,7 +317,7 @@ export function Hero(): React.JSX.Element {
   // Use our adaptive UI hook for the main section as well
   const { width } = useAdaptiveUI();
   
-  // Calculate the appropriate transform and padding based on screen width
+  // Calculate the appropriate transform, padding, and scaling based on screen width
   const getMainContentStyles = () => {
     // For mobile screens, center the content without any transform
     if (width < 640) {
@@ -314,36 +325,65 @@ export function Hero(): React.JSX.Element {
         transform: 'none',
         paddingLeft: '1rem',
         paddingRight: '1rem',
-        maxWidth: '100%'
+        maxWidth: '100%',
+        zIndex: 10,
+        // No scaling needed for mobile as text already uses responsive classes
       };
     }
     
-    // For small to medium screens, use a small transform
+    // For small to medium screens (640px to 1024px)
     if (width >= 640 && width < 1024) {
+      // Calculate scale factor for text - subtle scaling to maintain readability
+      const textScaleFactor = 1; // No additional scaling needed as we use responsive classes
+      
       return {
-        transform: 'translateX(-3%)',
+        transform: 'none',
         paddingLeft: '2rem',
         paddingRight: '2rem',
-        maxWidth: '100%'
+        maxWidth: '100%',
+        zIndex: 10,
+        // No additional scaling needed as we use responsive text classes
       };
     }
     
-    // For large screens with notification visible, adjust transform to prevent overlap
+    // For large screens with notification visible (1024px to 1280px)
     if (width >= 1024 && width < 1280) {
+      // Calculate content position - adjusted for better balance with larger notification
+      const transformX = -20 + ((width - 1024) / (1280 - 1024)) * 4;
+      
+      // Calculate right padding to make space for notification
+      const rightPadding = 10 - ((width - 1024) / (1280 - 1024)) * 2;
+      
       return {
-        transform: 'translateX(-10%)',
+        transform: `translateX(${transformX}%)`,
         paddingLeft: '2rem',
-        paddingRight: '2rem',
-        maxWidth: '85%'
+        paddingRight: `${rightPadding}rem`,
+        maxWidth: '82%',
+        zIndex: 10,
       };
     }
     
-    // For extra large screens, use original transform
+    // For extra large screens (1280px to 1536px)
+    if (width >= 1280 && width < 1536) {
+      // Smoother transform adjustment with better centering
+      const transformX = -16 + ((width - 1280) / (1536 - 1280)) * 6;
+      
+      return {
+        transform: `translateX(${transformX}%)`,
+        paddingLeft: '2rem',
+        paddingRight: '5.5rem',
+        maxWidth: '87%',
+        zIndex: 10,
+      };
+    }
+    
+    // For very large screens (1536px and above)
     return {
-      transform: 'translateX(-7%)',
+      transform: 'translateX(-9%)',
       paddingLeft: '2rem',
-      paddingRight: '2rem',
-      maxWidth: '100%'
+      paddingRight: '6.5rem',
+      maxWidth: '90%',
+      zIndex: 10,
     };
   };
   
@@ -351,22 +391,47 @@ export function Hero(): React.JSX.Element {
   
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden w-full pb-20 pt-20 px-4">
-      {/* Success tracker notification feed */}
-      <NotificationFeed />
+      
+      {/* Add a viewport height listener for responsive adjustments */}
+      <div className="hidden">
+        {(() => {
+          // Use IIFE to execute this code and return null
+          if (typeof window !== 'undefined') {
+            // Use a separate effect for viewport height changes
+            useEffect(() => {
+              const viewportHeight = window.innerHeight;
+              const handleResize = () => {
+                // Force re-render when viewport height changes significantly
+                if (Math.abs(window.innerHeight - viewportHeight) > 50) {
+                  // Just trigger a re-render by using the existing state setter
+                  setShowScrollButton(prev => prev);
+                }
+              };
+              
+              window.addEventListener('resize', handleResize);
+              return () => window.removeEventListener('resize', handleResize);
+            }, []);
+          }
+          return null; // Return null to satisfy React's need for a ReactNode
+        })()}
+      </div>
+      
+      {/* Only show notification feed on the side for larger screens */}
+      {width >= 1024 && <NotificationFeed />}
 
       {/* Main content - positioned based on reference UI with adaptive positioning */}
       <div 
-        className="relative z-10 container mx-auto transition-all duration-300"
+        className="relative container mx-auto transition-all duration-300"
         style={mainContentStyles}
       >
         <ScrollReveal>
           <h1 className="text-center font-bold tracking-tight max-w-[95%] mx-auto">
-            <GradientText className="text-4xl sm:text-5xl md:text-6xl lg:text-[6.2rem] [text-shadow:_0_1px_3px_rgb(0_0_0_/_10%)] dark:[text-shadow:_0_1px_3px_rgb(255_255_255_/_10%)]">
+            <GradientText className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] xl:text-[6.2rem] 2xl:text-[7.2rem] [text-shadow:_0_1px_3px_rgb(0_0_0_/_10%)] dark:[text-shadow:_0_1px_3px_rgb(255_255_255_/_10%)] transition-all duration-300 leading-[1.1]">
               Launch Your SaaS
             </GradientText>
-            <div className="mt-4">
+            <div className="mt-2 sm:mt-3 md:mt-4">
               <GradientText
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-[6.2rem] [text-shadow:_0_1px_3px_rgb(0_0_0_/_10%)] dark:[text-shadow:_0_1px_3px_rgb(255_255_255_/_10%)]"
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] xl:text-[6.2rem] 2xl:text-[7.2rem] [text-shadow:_0_1px_3px_rgb(0_0_0_/_10%)] dark:[text-shadow:_0_1px_3px_rgb(255_255_255_/_10%)] transition-all duration-300 leading-[1.1]"
                 from="#4B7BF5"
                 to="#9181F2"
                 animate={true}
@@ -379,7 +444,7 @@ export function Hero(): React.JSX.Element {
 
         <ScrollReveal delay={0.2}>
           <motion.div
-            className="mt-8 text-center text-2xl sm:text-3xl text-foreground max-w-5xl mx-auto font-medium leading-relaxed"
+            className="mt-4 sm:mt-6 md:mt-7 lg:mt-8 xl:mt-10 text-center text-lg sm:text-xl md:text-xl lg:text-xl xl:text-2xl 2xl:text-3xl text-foreground max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto font-medium leading-relaxed transition-all duration-300"
             initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
           >
@@ -483,7 +548,10 @@ export function Hero(): React.JSX.Element {
         </ScrollReveal>
 
         <ScrollReveal delay={0.4}>
-          <div className="mt-10 flex flex-col sm:flex-row justify-center gap-5 items-center">
+          {/* Show notification feed below content on mobile/small screens */}
+          {width < 1024 && <div className="w-full mt-8 sm:mt-10"><NotificationFeed /></div>}
+          
+          <div className="mt-6 sm:mt-8 md:mt-10 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 md:gap-5 items-center transition-all duration-300">
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

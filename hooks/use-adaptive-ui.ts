@@ -3,13 +3,19 @@
 import { useEffect, useState } from 'react';
 
 // Define breakpoints that match Tailwind's default breakpoints
+// Added intermediate breakpoints for more precise control
 export const breakpoints = {
   xs: 0,
   sm: 640,
   md: 768,
   lg: 1024,
   xl: 1280,
-  '2xl': 1536
+  '2xl': 1536,
+  // Intermediate breakpoints for more granular control
+  'sm-md': 704, // Between sm and md
+  'md-lg': 896, // Between md and lg
+  'lg-xl': 1152, // Between lg and xl
+  'xl-2xl': 1408 // Between xl and 2xl
 };
 
 export type Breakpoint = keyof typeof breakpoints;
@@ -26,9 +32,14 @@ export interface AdaptiveUIState {
   isMobile: boolean;
   isTablet: boolean;
   isDesktop: boolean;
+  isSmallDesktop: boolean; // Added for more precise control
+  isLargeDesktop: boolean; // Added for more precise control
   width: number;
   height: number;
   orientation: 'portrait' | 'landscape';
+  aspectRatio: number; // Added for more precise layout control
+  isNarrowScreen: boolean; // Added for detecting narrow browser windows
+  isWideScreen: boolean; // Added for detecting wide browser windows
 }
 
 /**
@@ -48,9 +59,14 @@ export function useAdaptiveUI(): AdaptiveUIState {
     isMobile: false,
     isTablet: false,
     isDesktop: true,
+    isSmallDesktop: true,
+    isLargeDesktop: false,
     width: 1024,
     height: 768,
-    orientation: 'landscape'
+    orientation: 'landscape',
+    aspectRatio: 1024 / 768,
+    isNarrowScreen: false,
+    isWideScreen: true
   });
 
   useEffect(() => {
@@ -62,14 +78,23 @@ export function useAdaptiveUI(): AdaptiveUIState {
       const width = window.innerWidth;
       const height = window.innerHeight;
       const orientation = width > height ? 'landscape' : 'portrait';
+      const aspectRatio = width / height;
 
-      // Determine current breakpoint
+      // Determine current breakpoint with more precision
       let currentBreakpoint: Breakpoint = 'xs';
       if (width >= breakpoints['2xl']) currentBreakpoint = '2xl';
       else if (width >= breakpoints.xl) currentBreakpoint = 'xl';
       else if (width >= breakpoints.lg) currentBreakpoint = 'lg';
       else if (width >= breakpoints.md) currentBreakpoint = 'md';
       else if (width >= breakpoints.sm) currentBreakpoint = 'sm';
+
+      // Detect intermediate breakpoints for more precise layout control
+      const isSmallDesktop = width >= breakpoints.lg && width < breakpoints['lg-xl'];
+      const isLargeDesktop = width >= breakpoints.xl;
+      
+      // Detect narrow and wide screens based on aspect ratio
+      const isNarrowScreen = aspectRatio < 1.2; // Narrower than typical landscape
+      const isWideScreen = aspectRatio > 1.8; // Wider than typical landscape
 
       // Update state with all relevant information
       setState({
@@ -83,9 +108,14 @@ export function useAdaptiveUI(): AdaptiveUIState {
         isMobile: width < breakpoints.md,
         isTablet: width >= breakpoints.md && width < breakpoints.lg,
         isDesktop: width >= breakpoints.lg,
+        isSmallDesktop,
+        isLargeDesktop,
         width,
         height,
-        orientation
+        orientation,
+        aspectRatio,
+        isNarrowScreen,
+        isWideScreen
       });
     };
 
